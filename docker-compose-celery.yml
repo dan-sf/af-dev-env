@@ -2,7 +2,6 @@ version: '3'
 services:
     redis:
         image: 'redis:3.2.7'
-        # command: redis-server --requirepass redispass
 
     postgres:
         image: postgres:9.6
@@ -10,10 +9,11 @@ services:
             - POSTGRES_USER=airflow
             - POSTGRES_PASSWORD=airflow
             - POSTGRES_DB=airflow
-        # Uncomment these lines to persist data on the local filesystem.
-        #     - PGDATA=/var/lib/postgresql/data/pgdata
-        # volumes:
-        #     - ./pgdata:/var/lib/postgresql/data/pgdata
+            - PGDATA=/var/lib/pgsql/data
+        volumes:
+            - ./data:/var/lib/pgsql/data
+        ports: # @FollowUp: This might not be needed... (this just exposes the port to the host machine)
+            - "5432:5432"
 
     webserver:
         image: af-dev:latest
@@ -25,14 +25,9 @@ services:
             - LOAD_EX=n
             - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
             - EXECUTOR=Celery
-            # - POSTGRES_USER=airflow
-            # - POSTGRES_PASSWORD=airflow
-            # - POSTGRES_DB=airflow
-            # - REDIS_PASSWORD=redispass
         volumes:
             - ./dags:/usr/local/airflow/dags
-            # Uncomment to include custom plugins
-            # - ./plugins:/usr/local/airflow/plugins
+            - ./logs/webserver:/usr/local/airflow/logs
         ports:
             - "8080:8080"
         command: webserver
@@ -49,7 +44,8 @@ services:
             - redis
         environment:
             - EXECUTOR=Celery
-            # - REDIS_PASSWORD=redispass
+        volumes:
+            - ./logs/flower:/usr/local/airflow/logs
         ports:
             - "5555:5555"
         command: flower
@@ -61,16 +57,11 @@ services:
             - webserver
         volumes:
             - ./dags:/usr/local/airflow/dags
-            # Uncomment to include custom plugins
-            # - ./plugins:/usr/local/airflow/plugins
+            - ./logs/scheduler:/usr/local/airflow/logs
         environment:
             - LOAD_EX=n
             - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
             - EXECUTOR=Celery
-            # - POSTGRES_USER=airflow
-            # - POSTGRES_PASSWORD=airflow
-            # - POSTGRES_DB=airflow
-            # - REDIS_PASSWORD=redispass
         command: scheduler
 
     worker:
@@ -80,14 +71,9 @@ services:
             - scheduler
         volumes:
             - ./dags:/usr/local/airflow/dags
-            # Uncomment to include custom plugins
-            # - ./plugins:/usr/local/airflow/plugins
+            - ./logs/worker:/usr/local/airflow/logs
         environment:
             - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
             - EXECUTOR=Celery
-            # - POSTGRES_USER=airflow
-            # - POSTGRES_PASSWORD=airflow
-            # - POSTGRES_DB=airflow
-            # - REDIS_PASSWORD=redispass
         command: worker
 
