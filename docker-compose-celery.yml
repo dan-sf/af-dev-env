@@ -28,6 +28,7 @@ services:
         volumes:
             - ./dags:/usr/local/airflow/dags
             - ./logs/webserver:/usr/local/airflow/logs
+            - ../../git/incubator-airflow:/usr/local/airflow/code
         ports:
             - "8080:8080"
         command: webserver
@@ -46,6 +47,7 @@ services:
             - EXECUTOR=Celery
         volumes:
             - ./logs/flower:/usr/local/airflow/logs
+            - ../../git/incubator-airflow:/usr/local/airflow/code
         ports:
             - "5555:5555"
         command: flower
@@ -58,6 +60,7 @@ services:
         volumes:
             - ./dags:/usr/local/airflow/dags
             - ./logs/scheduler:/usr/local/airflow/logs
+            - ../../git/incubator-airflow:/usr/local/airflow/code
         environment:
             - LOAD_EX=n
             - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
@@ -72,6 +75,7 @@ services:
         volumes:
             - ./dags:/usr/local/airflow/dags
             - ./logs/worker:/usr/local/airflow/logs
+            - ../../git/incubator-airflow:/usr/local/airflow/code
         environment:
             - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
             - EXECUTOR=Celery
