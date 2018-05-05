@@ -1,7 +1,7 @@
 # Build image
-# bash build.sh
+# ./build.sh
 
-FROM python:3.6-slim
+FROM python:3-slim
 
 # Never prompts the user for choices on installation/configuration of packages
 ENV DEBIAN_FRONTEND noninteractive
@@ -17,9 +17,7 @@ ENV LC_ALL en_US.UTF-8
 ENV LC_CTYPE en_US.UTF-8
 ENV LC_MESSAGES en_US.UTF-8
 
-RUN set -ex \
-    && buildDeps=' \
-        python3-dev \
+ARG BUILD_DEPS='python3-dev \
         libkrb5-dev \
         libsasl2-dev \
         libssl-dev \
@@ -28,12 +26,13 @@ RUN set -ex \
         libblas-dev \
         liblapack-dev \
         libpq-dev \
-        git \
-    ' \
+        git'
+
+RUN set -ex \
     && apt-get update -yqq \
     && apt-get upgrade -yqq \
     && apt-get install -yqq --no-install-recommends \
-        $buildDeps \
+        $BUILD_DEPS \
         python3-pip \
         python3-requests \
         mysql-client \
@@ -56,8 +55,14 @@ RUN set -ex \
     && pip install pyOpenSSL \
     && pip install ndg-httpsclient \
     && pip install pyasn1 \
-    && pip install celery[redis]==4.0.2 \
-    && apt-get purge --auto-remove -yqq $buildDeps \
+    && pip install psutil \
+    && pip install celery[redis]==4.0.2
+
+ENV PYTHONPATH=${CODE_PATH}
+COPY incubator-airflow ${CODE_PATH}
+RUN cd ${CODE_PATH} && pip install -e .[crypto,celery,postgres,hive,jdbc,mysql]
+
+RUN apt-get purge --auto-remove -yqq $BUILD_DEPS \
     && apt-get autoremove -yqq --purge \
     && apt-get clean \
     && rm -rf \
@@ -67,10 +72,6 @@ RUN set -ex \
         /usr/share/man \
         /usr/share/doc \
         /usr/share/doc-base
-
-ENV PYTHONPATH=${CODE_PATH}
-COPY incubator-airflow ${CODE_PATH}
-RUN cd ${CODE_PATH} && pip install -e .[crypto,celery,postgres,hive,jdbc,mysql]
 
 COPY entrypoint.sh /entrypoint.sh
 COPY airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
