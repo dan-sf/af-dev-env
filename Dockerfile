@@ -1,5 +1,5 @@
 # Build image
-# ./build.sh
+# ./build.sh [version]
 
 FROM python:3-slim
 
@@ -45,6 +45,7 @@ RUN set -ex \
         locales \
         vim \
         less \
+        sudo \
     && sed -i 's/^# en_US.UTF-8 UTF-8$/en_US.UTF-8 UTF-8/g' /etc/locale.gen \
     && locale-gen \
     && update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 \
@@ -57,6 +58,20 @@ RUN set -ex \
     && pip install pyasn1 \
     && pip install psutil \
     && pip install celery[redis]==4.0.2
+
+ADD requirements.txt ${AIRFLOW_HOME}/requirements.txt
+RUN pip install -r ${AIRFLOW_HOME}/requirements.txt
+
+# Installing the postgresql-client needs some dirs that aren't included in the slim version
+# https://github.com/dalibo/temboard/commit/ff98d6740ae11345658508b02052294d6cffd448
+RUN mkdir -p /usr/share/man/man1 \
+    && mkdir -p /usr/share/man/man7 \
+    && apt-get install -yqq --no-install-recommends postgresql-client
+
+# Install debugging tools
+RUN apt-get install -yqq --no-install-recommends \
+        gdb \
+        python3-dbg
 
 ENV PYTHONPATH=${CODE_PATH}
 COPY incubator-airflow ${CODE_PATH}

@@ -11,12 +11,12 @@ services:
             - POSTGRES_DB=airflow
             - PGDATA=/var/lib/pgsql/data
         volumes:
-            - ./data:/var/lib/pgsql/data
+            - ./{pgsql_data_location}:/var/lib/pgsql/data
         ports: # @FollowUp: This might not be needed... (this just exposes the port to the host machine)
             - "5432:5432"
 
     webserver:
-        image: af-dev:latest
+        image: af-dev:{version}
         restart: always
         depends_on:
             - postgres
@@ -28,7 +28,7 @@ services:
         volumes:
             - ./dags:/usr/local/airflow/dags
             - ./logs/webserver:/usr/local/airflow/logs
-            - ../../git/incubator-airflow:/usr/local/airflow/code
+            - {airflow_source_path}:/usr/local/airflow/code
         ports:
             - "8080:8080"
         command: webserver
@@ -39,7 +39,7 @@ services:
             retries: 3
 
     flower:
-        image: af-dev:latest
+        image: af-dev:{version}
         restart: always
         depends_on:
             - redis
@@ -47,20 +47,20 @@ services:
             - EXECUTOR=Celery
         volumes:
             - ./logs/flower:/usr/local/airflow/logs
-            - ../../git/incubator-airflow:/usr/local/airflow/code
+            - {airflow_source_path}:/usr/local/airflow/code
         ports:
             - "5555:5555"
         command: flower
 
     scheduler:
-        image: af-dev:latest
+        image: af-dev:{version}
         restart: always
         depends_on:
             - webserver
         volumes:
             - ./dags:/usr/local/airflow/dags
             - ./logs/scheduler:/usr/local/airflow/logs
-            - ../../git/incubator-airflow:/usr/local/airflow/code
+            - {airflow_source_path}:/usr/local/airflow/code
         environment:
             - LOAD_EX=n
             - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
@@ -68,14 +68,14 @@ services:
         command: scheduler
 
     worker:
-        image: af-dev:latest
+        image: af-dev:{version}
         restart: always
         depends_on:
             - scheduler
         volumes:
             - ./dags:/usr/local/airflow/dags
             - ./logs/worker:/usr/local/airflow/logs
-            - ../../git/incubator-airflow:/usr/local/airflow/code
+            - {airflow_source_path}:/usr/local/airflow/code
         environment:
             - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
             - EXECUTOR=Celery

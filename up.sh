@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-executor=$1
-docker-compose -f docker-compose-${executor}.yml up -d
+curr_path=`dirname $0`
+${curr_path}/compose.py -v 1.9.0
