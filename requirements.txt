@@ -46,3 +46,5 @@ six==1.11.0
 tensorflow==1.5.0
 tensorflow-tensorboard==0.1.8
 Werkzeug==0.14.1
+
+celery==4.1.1

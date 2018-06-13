@@ -19,9 +19,14 @@ elif [[ $version == '1.8.2' ]]
 then
     AF_SRC=$AF_SRC_182
     TAG=${version}
-else
+elif [[ $version == 'master' ]] || [[ $version == '' ]]
+then
     AF_SRC=$AF_SRC_MASTER
     TAG='master'
+else
+    echo "Error: Unrecognized argument\n\t${version}"
+    echo "Usage: ./build.sh [master|1.9.0|1.8.2]"
+    exit 1
 fi
 
 # Create the python egg file in the airflow src dir
