@@ -1,0 +1,10 @@
+version: "3"
+services:
+    cli:
+        image: af-dev:{version}
+        volumes:
+        - ./dags:/usr/local/airflow/dags
+        - ./logs/cli:/usr/local/airflow/logs
+        - {airflow_source_path}:/usr/local/airflow/code
+        entrypoint: /bin/bash
+

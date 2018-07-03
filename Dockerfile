@@ -1,7 +1,7 @@
 # Build image
 # ./build.sh [version]
 
-FROM python:3-slim
+FROM python:3.5-slim
 
 # Never prompts the user for choices on installation/configuration of packages
 ENV DEBIAN_FRONTEND noninteractive
@@ -57,6 +57,7 @@ RUN set -ex \
     && pip install ndg-httpsclient \
     && pip install pyasn1 \
     && pip install psutil \
+    && pip install tox \
     && pip install celery[redis]==4.0.2
 
 ADD requirements.txt ${AIRFLOW_HOME}/requirements.txt
@@ -74,8 +75,11 @@ RUN apt-get install -yqq --no-install-recommends \
         python3-dbg
 
 ENV PYTHONPATH=${CODE_PATH}
+ENV PYMSSQL_BUILD_WITH_BUNDLED_FREETDS=1
 COPY incubator-airflow ${CODE_PATH}
-RUN cd ${CODE_PATH} && pip install -e .[crypto,celery,postgres,hive,jdbc,mysql]
+RUN cd ${CODE_PATH} && pip install -e .[crypto,celery,postgres,hdfs,hive,jdbc,mysql,devel_ci]
+# Thrift seems to cause issues so manually upgrading here
+RUN pip install --upgrade thrift
 
 RUN apt-get purge --auto-remove -yqq $BUILD_DEPS \
     && apt-get autoremove -yqq --purge \
