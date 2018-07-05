@@ -60,9 +60,6 @@ RUN set -ex \
     && pip install tox \
     && pip install celery[redis]==4.0.2
 
-ADD requirements.txt ${AIRFLOW_HOME}/requirements.txt
-RUN pip install -r ${AIRFLOW_HOME}/requirements.txt
-
 # Installing the postgresql-client needs some dirs that aren't included in the slim version
 # https://github.com/dalibo/temboard/commit/ff98d6740ae11345658508b02052294d6cffd448
 RUN mkdir -p /usr/share/man/man1 \
@@ -73,6 +70,9 @@ RUN mkdir -p /usr/share/man/man1 \
 RUN apt-get install -yqq --no-install-recommends \
         gdb \
         python3-dbg
+
+ADD requirements.txt ${AIRFLOW_HOME}/requirements.txt
+RUN pip install -r ${AIRFLOW_HOME}/requirements.txt
 
 ENV PYTHONPATH=${CODE_PATH}
 ENV PYMSSQL_BUILD_WITH_BUNDLED_FREETDS=1
@@ -92,14 +92,21 @@ RUN apt-get purge --auto-remove -yqq $BUILD_DEPS \
         /usr/share/doc \
         /usr/share/doc-base
 
-COPY entrypoint.sh /entrypoint.sh
-COPY airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
+# Should I just copy these over then create a volume when running compose???
+VOLUME /scripts
+VOLUME /config
+
+# COPY entrypoint.sh /entrypoint.sh
+# # This should be a volume so we don't need to rebuild the image every time this file changes
+# COPY airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
 
 RUN chown -R airflow: ${AIRFLOW_HOME}
+RUN ln -s /config/airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
+RUN ln -s /config/webserver_config.py ${AIRFLOW_HOME}/webserver_config.py
 
 EXPOSE 8080 5555 8793
 
 USER airflow
 WORKDIR ${AIRFLOW_HOME}
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/scripts/entrypoint.sh"]
 

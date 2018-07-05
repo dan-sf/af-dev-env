@@ -23,12 +23,15 @@ services:
             - redis
         environment:
             - LOAD_EX=n
+            - AIRFLOW_HOME=/usr/local/airflow
             - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
             - EXECUTOR=Celery
         volumes:
             - ./dags:/usr/local/airflow/dags
             - ./logs/webserver:/usr/local/airflow/logs
             - {airflow_source_path}:/usr/local/airflow/code
+            - ./scripts:/scripts
+            - ./config:/config
         ports:
             - "8080:8080"
         command: webserver
@@ -44,10 +47,13 @@ services:
         depends_on:
             - redis
         environment:
+            - AIRFLOW_HOME=/usr/local/airflow
             - EXECUTOR=Celery
         volumes:
             - ./logs/flower:/usr/local/airflow/logs
             - {airflow_source_path}:/usr/local/airflow/code
+            - ./scripts:/scripts
+            - ./config:/config
         ports:
             - "5555:5555"
         command: flower
@@ -61,8 +67,11 @@ services:
             - ./dags:/usr/local/airflow/dags
             - ./logs/scheduler:/usr/local/airflow/logs
             - {airflow_source_path}:/usr/local/airflow/code
+            - ./scripts:/scripts
+            - ./config:/config
         environment:
             - LOAD_EX=n
+            - AIRFLOW_HOME=/usr/local/airflow
             - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
             - EXECUTOR=Celery
         command: scheduler
@@ -76,7 +85,10 @@ services:
             - ./dags:/usr/local/airflow/dags
             - ./logs/worker:/usr/local/airflow/logs
             - {airflow_source_path}:/usr/local/airflow/code
+            - ./scripts:/scripts
+            - ./config:/config
         environment:
+            - AIRFLOW_HOME=/usr/local/airflow
             - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
             - EXECUTOR=Celery
         command: worker

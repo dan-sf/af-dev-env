@@ -2,9 +2,13 @@ version: "3"
 services:
     cli:
         image: af-dev:{version}
+        environment:
+            - AIRFLOW_HOME=/usr/local/airflow
         volumes:
-        - ./dags:/usr/local/airflow/dags
-        - ./logs/cli:/usr/local/airflow/logs
-        - {airflow_source_path}:/usr/local/airflow/code
+            - ./dags:/usr/local/airflow/dags
+            - ./logs/cli:/usr/local/airflow/logs
+            - {airflow_source_path}:/usr/local/airflow/code
+            - ./scripts:/scripts
+            - ./config:/config
         entrypoint: /bin/bash
 
