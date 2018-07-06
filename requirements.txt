@@ -48,3 +48,5 @@ tensorflow-tensorboard==0.1.8
 Werkzeug==0.14.1
 
 celery==4.1.1
+
+Flask-OAuthlib
