@@ -42,7 +42,12 @@ AUTH_TYPE = AUTH_OAUTH
 AUTH_USER_REGISTRATION = True
 
 # The default user self registration role
-AUTH_USER_REGISTRATION_ROLE = "Admin" # @Update: this should be changed to viewer (only use for testing)
+AUTH_USER_REGISTRATION_ROLE = "Viewer"
+
+# If only using oauth for login/user creation you need to manually create an
+# admin user in the db:
+# psql -U airflow -d airflow
+# update ab_user_role set role_id = 1 where user_id = 1; # Replace user_id = 1 with the user id you need to have admin role
 
 # Required for Okta OAuth
 state_param = base64.b64encode(b'xyzabc123').decode('utf-8')
