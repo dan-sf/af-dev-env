@@ -37,7 +37,7 @@ def create_compose_file(args):
     elif args.env == 'cli':
         with open(os.path.join(current_dir, 'docker-compose-cli.template.yml')) as template:
             read_template = template.readlines()
-            format_template = ''.join(read_template).format(airflow_source_path=af_path, version=args.version)
+            format_template = ''.join(read_template).format(pgsql_data_location=data_dir, airflow_source_path=af_path, version=args.version)
             with open(os.path.join(current_dir, compose_file), 'w') as out:
                 out.write(format_template)
     return compose_file
@@ -50,7 +50,7 @@ if __name__ == "__main__":
         subprocess.run(["docker-compose", "down"])
     else:
         if args.env == 'cli':
-            subprocess.run(["docker-compose", "run", "--rm", '-u', 'root', "cli"])
+            subprocess.run(["docker-compose", "run", "--rm", "cli"])
         else:
             subprocess.run(["docker-compose", "up", "-d"])
     os.remove(compose_file)

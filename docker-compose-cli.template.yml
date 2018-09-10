@@ -1,7 +1,21 @@
 version: "3"
 services:
+    postgres:
+        image: postgres:9.6
+        environment:
+            - POSTGRES_USER=airflow
+            - POSTGRES_PASSWORD=airflow
+            - POSTGRES_DB=airflow
+            - PGDATA=/var/lib/pgsql/data
+        volumes:
+            - ./{pgsql_data_location}:/var/lib/pgsql/data
+        ports: # @FollowUp: This might not be needed... (this just exposes the port to the host machine)
+            - "5432:5432"
+
     cli:
         image: af-dev:{version}
+        depends_on:
+            - postgres
         environment:
             - AIRFLOW_HOME=/usr/local/airflow
         volumes:
@@ -11,4 +25,5 @@ services:
             - ./scripts:/scripts
             - ./config:/config
         entrypoint: /bin/bash
+        #user: root # @Question: should cli as root be optional here?
 
