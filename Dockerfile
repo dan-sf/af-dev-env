@@ -77,7 +77,8 @@ RUN pip install -r ${AIRFLOW_HOME}/requirements.txt
 ENV PYTHONPATH=${CODE_PATH}
 ENV PYMSSQL_BUILD_WITH_BUNDLED_FREETDS=1
 COPY incubator-airflow ${CODE_PATH}
-RUN cd ${CODE_PATH} && pip install -e .[crypto,celery,postgres,hdfs,hive,jdbc,mysql,devel_ci]
+RUN cd ${CODE_PATH} && export SLUGIFY_USES_TEXT_UNIDECODE=yes && pip install -e .[crypto,celery,postgres,hdfs,hive,jdbc,mysql,devel_ci]
+
 # Thrift seems to cause issues so manually upgrading here
 RUN pip install --upgrade thrift
 

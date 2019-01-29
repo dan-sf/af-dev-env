@@ -4,14 +4,22 @@ set -e
 
 version=$1
 
+# Airflow needs this...
+export SLUGIFY_USES_TEXT_UNIDECODE=yes
+
 # Path to airflow source
 AF_SRC_MASTER='../incubator-airflow'
 AF_SRC_190='../airflow_versions/1.9.0/incubator-airflow'
 AF_SRC_182='../airflow_versions/1.8.2/incubator-airflow'
+AF_SRC_1101='../airflow_versions/1.10.1/incubator-airflow'
 
 [[ -d incubator-airflow ]] && rm -rf incubator-airflow
 
-if [[ $version == '1.9.0' ]]
+if [[ $version == '1.10.1' ]]
+then
+    AF_SRC=$AF_SRC_1101
+    TAG=${version}
+elif [[ $version == '1.9.0' ]]
 then
     AF_SRC=$AF_SRC_190
     TAG=${version}
@@ -25,7 +33,7 @@ then
     TAG='master'
 else
     echo "Error: Unrecognized argument\n\t${version}"
-    echo "Usage: ./build.sh [master|1.9.0|1.8.2]"
+    echo "Usage: ./build.sh [master|1.10.1|1.9.0|1.8.2]"
     exit 1
 fi
 

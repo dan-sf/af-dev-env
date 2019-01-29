@@ -15,7 +15,7 @@ def cmd_line_parser():
     parser.add_argument('-e', '--env', action='store', type=str, default='celery', choices=['celery', 'local', 'cli'],
                         help='Set which type of container to use (local, celery, or cli), defaults to use the Celery container')
     parser.add_argument('-v', '--version', action='store', type=str, default='master',
-                        choices=['master', '1.8.2', '1.9.0'],
+                        choices=['master', '1.8.2', '1.9.0', '1.10.1'],
                         help='Which version to use, defaults to master')
     parser.add_argument('-d', '--down', action='store_true', default=False,
                         help='Take the container down')
