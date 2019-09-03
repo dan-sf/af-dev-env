@@ -76,7 +76,7 @@ RUN pip install -r ${AIRFLOW_HOME}/requirements.txt
 
 ENV PYTHONPATH=${CODE_PATH}
 ENV PYMSSQL_BUILD_WITH_BUNDLED_FREETDS=1
-COPY incubator-airflow ${CODE_PATH}
+COPY airflow ${CODE_PATH}
 RUN cd ${CODE_PATH} && export SLUGIFY_USES_TEXT_UNIDECODE=yes && pip install -e .[crypto,celery,postgres,hdfs,hive,jdbc,mysql,devel_ci]
 
 # Thrift seems to cause issues so manually upgrading here
@@ -94,20 +94,22 @@ RUN apt-get purge --auto-remove -yqq $BUILD_DEPS \
         /usr/share/doc-base
 
 # Should I just copy these over then create a volume when running compose???
-VOLUME /scripts
-VOLUME /config
+VOLUME  ${AIRFLOW_HOME}/scripts
+VOLUME  ${AIRFLOW_HOME}/config
 
 # COPY entrypoint.sh /entrypoint.sh
 # # This should be a volume so we don't need to rebuild the image every time this file changes
 # COPY airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
 
 RUN chown -R airflow: ${AIRFLOW_HOME}
-RUN ln -s /config/airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
-RUN ln -s /config/webserver_config.py ${AIRFLOW_HOME}/webserver_config.py
+RUN ln -s ${AIRFLOW_HOME}/config/airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
+RUN ln -s ${AIRFLOW_HOME}/config/webserver_config.py ${AIRFLOW_HOME}/webserver_config.py
 
 EXPOSE 8080 5555 8793
 
 USER airflow
+RUN usermod -aG sudo airflow
+
 WORKDIR ${AIRFLOW_HOME}
-ENTRYPOINT ["/scripts/entrypoint.sh"]
+ENTRYPOINT ["${AIRFLOW_HOME}/scripts/entrypoint.sh"]
 

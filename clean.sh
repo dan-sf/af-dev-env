@@ -2,5 +2,5 @@
 
 # Get logs and backing db to original state
 
-rm -r logs data
+rm -r logs pgsql_data_*
 

@@ -8,7 +8,7 @@ services:
             - POSTGRES_DB=airflow
 
     webserver:
-        image: af-dev:{version}
+        image: af-dev:{tag}
         restart: always
         depends_on:
             - postgres

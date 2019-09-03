@@ -17,27 +17,24 @@ def cmd_line_parser():
     parser.add_argument('-v', '--version', action='store', type=str, default='master',
                         choices=['master', '1.8.2', '1.9.0', '1.10.1'],
                         help='Which version to use, defaults to master')
+    parser.add_argument('-t', '--tag', action='store', type=str, default='latest',
+                        help="Docker tag for which image to use, defaults to 'latest'")
+    parser.add_argument('-s', '--source', action='store', type=str, required=True,
+                        help='Path to airflow source code')
     parser.add_argument('-d', '--down', action='store_true', default=False,
-                        help='Take the container down')
+                        help='Take the containers down')
     return parser.parse_args()
 
 def create_compose_file(args):
     compose_file = 'docker-compose.yml'
     current_dir = os.path.dirname(os.path.realpath(__file__))
-    data_dir = 'data_' + args.version.replace('.', '') if args.version != 'master' else 'data'
-    af_path = '../airflow_versions/{}/incubator-airflow'.format(args.version) if args.version != 'master' else '../incubator-airflow'
+    data_dir = 'pgsql_data_' + args.tag
     if args.env == 'local':
         pass # @NotDone
-    elif args.env == 'celery':
-        with open(os.path.join(current_dir, 'docker-compose-celery.template.yml')) as template:
+    else:
+        with open(os.path.join(current_dir, 'docker-compose-{}.template.yml'.format(args.env))) as template:
             read_template = template.readlines()
-            format_template = ''.join(read_template).format(pgsql_data_location=data_dir, airflow_source_path=af_path, version=args.version)
-            with open(os.path.join(current_dir, compose_file), 'w') as out:
-                out.write(format_template)
-    elif args.env == 'cli':
-        with open(os.path.join(current_dir, 'docker-compose-cli.template.yml')) as template:
-            read_template = template.readlines()
-            format_template = ''.join(read_template).format(pgsql_data_location=data_dir, airflow_source_path=af_path, version=args.version)
+            format_template = ''.join(read_template).format(pgsql_data_location=data_dir, airflow_source_path=args.source, tag=args.tag)
             with open(os.path.join(current_dir, compose_file), 'w') as out:
                 out.write(format_template)
     return compose_file

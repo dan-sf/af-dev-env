@@ -13,7 +13,7 @@ services:
             - "5432:5432"
 
     cli:
-        image: af-dev:{version}
+        image: af-dev:{tag}
         depends_on:
             - postgres
         environment:
@@ -22,8 +22,8 @@ services:
             - ./dags:/usr/local/airflow/dags
             - ./logs/cli:/usr/local/airflow/logs
             - {airflow_source_path}:/usr/local/airflow/code
-            - ./scripts:/scripts
-            - ./config:/config
+            - ./scripts:/usr/local/airflow/scripts
+            - ./config:/usr/local/airflow/config
         entrypoint: /bin/bash
         #user: root # @Question: should cli as root be optional here?
 
