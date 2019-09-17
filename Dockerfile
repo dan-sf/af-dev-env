@@ -107,8 +107,8 @@ RUN ln -s ${AIRFLOW_HOME}/config/webserver_config.py ${AIRFLOW_HOME}/webserver_c
 
 EXPOSE 8080 5555 8793
 
-USER airflow
 RUN usermod -aG sudo airflow
+USER airflow
 
 WORKDIR ${AIRFLOW_HOME}
 ENTRYPOINT ["${AIRFLOW_HOME}/scripts/entrypoint.sh"]
