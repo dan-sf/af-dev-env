@@ -28,7 +28,7 @@ html5lib==0.9999999
 Markdown==2.6.11
 olefile==0.45.1
 Pillow==4.3.0
-PyYAML==3.12
+PyYAML==5.4
 six==1.11.0
 Werkzeug==0.14.1
 
